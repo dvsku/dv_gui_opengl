@@ -1,8 +1,8 @@
 ﻿CMAKE_MINIMUM_REQUIRED (VERSION 3.10)
 
-PROJECT(dv_gui_opengl)
+#PROJECT(dv_gui_opengl)
 
-SET(DV_GUI_INCLUDES "${dv_gui_opengl_SOURCE_DIR}/include")
+SET(DV_GUI_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 IF(WIN32)
 	ENABLE_LANGUAGE("RC")
