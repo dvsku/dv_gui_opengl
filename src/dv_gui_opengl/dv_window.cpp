@@ -15,7 +15,7 @@
 //#include "utilities/dv_util_mouse.hpp"
 //#include "utilities/dv_util_log.hpp"
 
-using namespace dvsku::gui;
+using namespace dvsku;
 
 ///////////////////////////////////////////////////////////////////////////////
 // INTERNAL

@@ -4,7 +4,7 @@
 
 struct GLFWwindow;
 
-namespace dvsku::gui {
+namespace dvsku {
     class dv_window {
     public:
         using handle_t = void*;
