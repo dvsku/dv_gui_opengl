@@ -3,6 +3,7 @@
 #include <windows.h>
 
 #include "dv_gui_opengl/dv_window.hpp"
+#include "dv_gui_opengl/utilities/dv_util_log.hpp"
 #include "glad/glad.h"
 #include "glfw/glfw3.h"
 #include "glfw/glfw3native.h"
@@ -12,8 +13,6 @@
 #include "backends/imgui_impl_opengl3.h"
 
 #include <stdexcept>
-//#include "utilities/dv_util_mouse.hpp"
-//#include "utilities/dv_util_log.hpp"
 
 using namespace dvsku;
 
@@ -105,11 +104,11 @@ void dv_window::run() {
     ImGui_ImplGlfw_InitForOpenGL(m_native, true);
     ImGui_ImplOpenGL3_Init();
 
-//#ifndef NDEBUG
-//    DV_LOG("OpenGL version:   {}", (char*)glGetString(GL_VERSION));
-//    DV_LOG("OpenGL renderer:  {}", (char*)glGetString(GL_RENDERER));
-//    DV_LOG("ImGUI version:    {}", get_imgui_version());
-//#endif
+#ifndef NDEBUG
+    DV_LOG("OpenGL version:   {}", (char*)glGetString(GL_VERSION));
+    DV_LOG("OpenGL renderer:  {}", (char*)glGetString(GL_RENDERER));
+    DV_LOG("ImGUI version:    {}", get_imgui_version());
+#endif
 
     // Cancel running if prepare failed
     if (!prepare()) return;
