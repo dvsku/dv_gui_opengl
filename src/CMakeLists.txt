@@ -16,7 +16,7 @@ FILE(GLOB_RECURSE DV_GUI_SOURCES CONFIGURE_DEPENDS
     "dv_gui_opengl/*.c" "dv_gui_opengl/*.cpp"
 )
 
-ADD_LIBRARY(dv_gui_opengl SHARED
+ADD_LIBRARY(dv_gui_opengl STATIC
     ${DV_GUI_SOURCES_GLFW}
 	${DV_GUI_SOURCES_GLAD}
 	${DV_GUI_SOURCES_IMGUI}
