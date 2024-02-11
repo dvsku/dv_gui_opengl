@@ -1,7 +1,5 @@
 #pragma once
 
-#include "dv_gui_opengl/models/dv_file_filter.hpp"
-
 #include <string>
 #include <vector>
 
