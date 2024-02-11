@@ -9,6 +9,13 @@ namespace dvsku::gui {
     public:
         using handle_t = void*;
 
+        struct mouse_pos {
+            double x  = 0.0;
+            double y  = 0.0;
+            double dx = 0.0;
+            double dy = 0.0;
+        };
+
     public:
         dv_window(uint32_t width, uint32_t height, const std::string& title);
     	virtual ~dv_window();
@@ -21,6 +28,8 @@ namespace dvsku::gui {
     protected:
     	GLFWwindow* m_native    = nullptr;
     	bool        m_minimized = false;
+
+        mouse_pos m_mouse_pos{};
 
     protected:
     	virtual bool prepare();

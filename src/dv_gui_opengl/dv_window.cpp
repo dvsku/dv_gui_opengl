@@ -342,13 +342,14 @@ void dv_window::mouse_button_callback(GLFWwindow* window, int button, int action
 }
 
 void dv_window::mouse_move_callback(GLFWwindow* window, double x, double y) {
-    //dv_util_mouse::delta.x	  = x - dv_util_mouse::position.x;
-    //dv_util_mouse::delta.y	  = dv_util_mouse::position.y - y;
-    //dv_util_mouse::position.x = x;
-    //dv_util_mouse::position.y = y;
+    dv_window* instance = static_cast<dv_window*>(glfwGetWindowUserPointer(window));
 
-    //dv_opengl_window* instance = static_cast<dv_opengl_window*>(glfwGetWindowUserPointer(window));
-    //instance->on_mouse_move(dv_util_mouse::delta.x, dv_util_mouse::delta.y);
+    instance->m_mouse_pos.dx = x - instance->m_mouse_pos.x;
+    instance->m_mouse_pos.dy = instance->m_mouse_pos.y - y;
+    instance->m_mouse_pos.x  = x;
+    instance->m_mouse_pos.y  = y;
+
+    instance->on_mouse_move(instance->m_mouse_pos.dx, instance->m_mouse_pos.dy);
 }
 
 void dv_window::iconify_callback(GLFWwindow* window, int iconified) {
