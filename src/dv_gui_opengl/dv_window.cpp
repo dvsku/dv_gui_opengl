@@ -1,10 +1,8 @@
-#include "dv_gui_opengl/dv_opengl_window.hpp"
-
-#include <windows.h>
-#include <stdexcept>
-
 #define GLFW_EXPOSE_NATIVE_WIN32
 
+#include <windows.h>
+
+#include "dv_gui_opengl/dv_window.hpp"
 #include "glad/glad.h"
 #include "glfw/glfw3.h"
 #include "glfw/glfw3native.h"
@@ -13,6 +11,7 @@
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_opengl3.h"
 
+#include <stdexcept>
 //#include "utilities/dv_util_mouse.hpp"
 //#include "utilities/dv_util_log.hpp"
 
@@ -22,11 +21,11 @@ using namespace devue::core;
 // INTERNAL
 
 static LRESULT CALLBACK redirect_callback(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-    dv_opengl_window* open_gl_wnd = (dv_opengl_window*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
-    if (!open_gl_wnd) 
+    dv_window* dv_wnd = (dv_window*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+    if (!dv_wnd)
         throw std::runtime_error("");
 
-    return dv_opengl_window::wndproc_callback(open_gl_wnd, hWnd, uMsg, wParam, lParam);
+    return dv_window::wndproc_callback(dv_wnd, hWnd, uMsg, wParam, lParam);
 }
 
 static std::string get_imgui_version() {
@@ -45,7 +44,7 @@ static std::string get_imgui_version() {
 ///////////////////////////////////////////////////////////////////////////////
 // PUBLIC
 
-dv_opengl_window::dv_opengl_window(uint32_t width, uint32_t height, const std::string& title) {
+dv_window::dv_window(uint32_t width, uint32_t height, const std::string& title) {
     glfwSetErrorCallback(NULL);
 
     if (!glfwInit())
@@ -63,10 +62,8 @@ dv_opengl_window::dv_opengl_window(uint32_t width, uint32_t height, const std::s
     // Set this as native handle userdata
     SetWindowLongPtr(win32_handle, GWLP_USERDATA, (intptr_t)this);
 
-    //ds_util_theme::update_title_bar_theme(native);
-
     glfwMakeContextCurrent(m_native);
-    glfwSwapInterval(1);				// enable vsync
+    glfwSwapInterval(1);
 
     glfwSetWindowUserPointer(m_native, this);
 
@@ -85,7 +82,7 @@ dv_opengl_window::dv_opengl_window(uint32_t width, uint32_t height, const std::s
     	throw std::runtime_error("Failed to init glad.");
 }
 
-dv_opengl_window::~dv_opengl_window() {
+dv_window::~dv_window() {
     glfwDestroyWindow(m_native);
     glfwTerminate();
 
@@ -94,7 +91,7 @@ dv_opengl_window::~dv_opengl_window() {
     ImGui::DestroyContext();
 }
 
-void dv_opengl_window::run() {
+void dv_window::run() {
     // Init imgui
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -120,7 +117,7 @@ void dv_opengl_window::run() {
     loop();
 }
 
-intptr_t dv_opengl_window::wndproc_callback(dv_opengl_window* wnd, handle_t handle, uint32_t msg, ulongptr_t wparam, longptr_t lparam) {
+intptr_t dv_window::wndproc_callback(dv_window* wnd, handle_t handle, uint32_t msg, uint64_t wparam, int64_t lparam) {
     HWND hwnd = (HWND)handle;
 
     switch (msg) {
@@ -158,10 +155,10 @@ intptr_t dv_opengl_window::wndproc_callback(dv_opengl_window* wnd, handle_t hand
             
             ScreenToClient(hwnd, &client_mouse_pos);
 
-            if (wnd->m_hover_maximize)
+            if (wnd->is_maximize_button(client_mouse_pos.x, client_mouse_pos.y))
                 return HTMAXBUTTON;
 
-            if (!wnd->m_skip_titlebar_hit && !modal && client_mouse_pos.y > 0 && client_mouse_pos.y <= wnd->m_custom_titlebar_height)
+            if (!modal && wnd->is_title_bar(client_mouse_pos.x, client_mouse_pos.y))
                 return HTCAPTION;
 
             break;
@@ -223,42 +220,50 @@ intptr_t dv_opengl_window::wndproc_callback(dv_opengl_window* wnd, handle_t hand
 ///////////////////////////////////////////////////////////////////////////////
 // PROTECTED
 
-bool dv_opengl_window::prepare() {
+bool dv_window::prepare() {
     return true;
 }
 
-void dv_opengl_window::release() {}
+void dv_window::release() {}
 
-void dv_opengl_window::on_before_update() {}
+void dv_window::on_before_update() {}
 
-void dv_opengl_window::on_after_update() {}
+void dv_window::on_after_update() {}
 
-void dv_opengl_window::on_gui_before_update() {}
+void dv_window::on_gui_before_update() {}
 
-void dv_opengl_window::on_gui_after_update() {}
+void dv_window::on_gui_after_update() {}
 
-void dv_opengl_window::on_resize(int width, int height) {}
+void dv_window::on_resize(int width, int height) {}
 
-void dv_opengl_window::on_scroll(double dx, double dy) {}
+void dv_window::on_scroll(double dx, double dy) {}
 
-void dv_opengl_window::on_mouse_button(int btn, int action, int modifier) {}
+void dv_window::on_mouse_button(int btn, int action, int modifier) {}
 
-void dv_opengl_window::on_mouse_move(double dx, double dy) {}
+void dv_window::on_mouse_move(double dx, double dy) {}
 
-void dv_opengl_window::on_drop(int count, const char* paths[]) {}
+void dv_window::on_drop(int count, const char* paths[]) {}
 
-void dv_opengl_window::set_borderless() {
+bool dv_window::is_title_bar(int32_t x, int32_t y) {
+    return false;
+}
+
+bool dv_window::is_maximize_button(int32_t x, int32_t y) {
+    return false;
+}
+
+void dv_window::set_borderless() {
     auto win32_wnd = glfwGetWin32Window(m_native);
     if (!win32_wnd)
         return;
 
-    dv_opengl_window* open_gl_wnd = (dv_opengl_window*)GetWindowLongPtr(win32_wnd, GWLP_USERDATA);
-    if (!open_gl_wnd)
+    dv_window* dv_wnd = (dv_window*)GetWindowLongPtr(win32_wnd, GWLP_USERDATA);
+    if (!dv_wnd)
         return;
 
     // Save default callback
-    open_gl_wnd->m_default_wndproc = GetWindowLongPtr(win32_wnd, GWLP_WNDPROC);
-    if (!open_gl_wnd->m_default_wndproc)
+    dv_wnd->m_default_wndproc = GetWindowLongPtr(win32_wnd, GWLP_WNDPROC);
+    if (!dv_wnd->m_default_wndproc)
         return;
 
     // Get win32 window style
@@ -285,7 +290,7 @@ void dv_opengl_window::set_borderless() {
 ///////////////////////////////////////////////////////////////////////////////
 // PRIVATE
 
-void dv_opengl_window::loop() {
+void dv_window::loop() {
     while (!glfwWindowShouldClose(m_native)) {
     	if (m_minimized) {
     		glfwWaitEvents();
@@ -317,26 +322,26 @@ void dv_opengl_window::loop() {
     release();
 }
 
-void dv_opengl_window::resize_callback(GLFWwindow* window, int width, int height) {
+void dv_window::resize_callback(GLFWwindow* window, int width, int height) {
     if (width == 0 || height == 0) return;
 
     glViewport(0, 0, width, height);
 
-    dv_opengl_window* instance = static_cast<dv_opengl_window*>(glfwGetWindowUserPointer(window));
+    dv_window* instance = static_cast<dv_window*>(glfwGetWindowUserPointer(window));
     instance->on_resize(width, height);
 }
 
-void dv_opengl_window::scroll_callback(GLFWwindow* window, double delta_x, double delta_y) {
-    dv_opengl_window* instance = static_cast<dv_opengl_window*>(glfwGetWindowUserPointer(window));
+void dv_window::scroll_callback(GLFWwindow* window, double delta_x, double delta_y) {
+    dv_window* instance = static_cast<dv_window*>(glfwGetWindowUserPointer(window));
     instance->on_scroll(delta_x, delta_y);
 }
 
-void dv_opengl_window::mouse_button_callback(GLFWwindow* window, int button, int action, int modifier) {
-    dv_opengl_window* instance = static_cast<dv_opengl_window*>(glfwGetWindowUserPointer(window));
+void dv_window::mouse_button_callback(GLFWwindow* window, int button, int action, int modifier) {
+    dv_window* instance = static_cast<dv_window*>(glfwGetWindowUserPointer(window));
     instance->on_mouse_button(button, action, modifier);
 }
 
-void dv_opengl_window::mouse_move_callback(GLFWwindow* window, double x, double y) {
+void dv_window::mouse_move_callback(GLFWwindow* window, double x, double y) {
     //dv_util_mouse::delta.x	  = x - dv_util_mouse::position.x;
     //dv_util_mouse::delta.y	  = dv_util_mouse::position.y - y;
     //dv_util_mouse::position.x = x;
@@ -346,12 +351,12 @@ void dv_opengl_window::mouse_move_callback(GLFWwindow* window, double x, double 
     //instance->on_mouse_move(dv_util_mouse::delta.x, dv_util_mouse::delta.y);
 }
 
-void dv_opengl_window::iconify_callback(GLFWwindow* window, int iconified) {
-    dv_opengl_window* instance = static_cast<dv_opengl_window*>(glfwGetWindowUserPointer(window));
+void dv_window::iconify_callback(GLFWwindow* window, int iconified) {
+    dv_window* instance = static_cast<dv_window*>(glfwGetWindowUserPointer(window));
     instance->m_minimized = (bool)iconified;
 }
 
-void dv_opengl_window::drop_callback(GLFWwindow* window, int count, const char* paths[]) {
-    dv_opengl_window* instance = static_cast<dv_opengl_window*>(glfwGetWindowUserPointer(window));
+void dv_window::drop_callback(GLFWwindow* window, int count, const char* paths[]) {
+    dv_window* instance = static_cast<dv_window*>(glfwGetWindowUserPointer(window));
     instance->on_drop(count, paths);
 }

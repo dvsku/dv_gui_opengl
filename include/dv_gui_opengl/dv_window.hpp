@@ -5,29 +5,22 @@
 struct GLFWwindow;
 
 namespace devue::core {
-    class dv_opengl_window {
-    private:
-        using handle_t   = void*;
-        using longptr_t  = intptr_t;
-        using ulongptr_t = size_t;
+    class dv_window {
+    public:
+        using handle_t = void*;
 
     public:
-    	dv_opengl_window(uint32_t width, uint32_t height, const std::string& title);
-    	virtual ~dv_opengl_window();
+        dv_window(uint32_t width, uint32_t height, const std::string& title);
+    	virtual ~dv_window();
 
+    public:
     	void run();
 
-        static intptr_t wndproc_callback(dv_opengl_window* wnd, handle_t handle, uint32_t msg, ulongptr_t wparam, longptr_t lparam);
+        static intptr_t wndproc_callback(dv_window* wnd, handle_t handle, uint32_t msg, uint64_t wparam, int64_t lparam);
 
     protected:
-    	GLFWwindow* m_native	= nullptr;
-    	bool m_minimized		= false;
-
-        // Move these to a separate struct
-
-        int32_t m_custom_titlebar_height = 0;
-        bool    m_skip_titlebar_hit      = false;
-        bool    m_hover_maximize         = false;
+    	GLFWwindow* m_native    = nullptr;
+    	bool        m_minimized = false;
 
     protected:
     	virtual bool prepare();
@@ -46,6 +39,18 @@ namespace devue::core {
     	virtual void on_mouse_button(int btn, int action, int modifier);
     	virtual void on_mouse_move(double dx, double dy);
         virtual void on_drop(int count, const char* paths[]);
+
+        /// <summary>
+        /// Title bar hit testing when borderless.
+        /// Enables window drag and snapping.
+        /// </summary>
+        virtual bool is_title_bar(int32_t x, int32_t y);
+
+        /// <summary>
+        /// Maximize/restore button hit testing when borderless
+        /// Enables snap.
+        /// </summary>
+        virtual bool is_maximize_button(int32_t x, int32_t y);
 
     protected:
         void set_borderless();
