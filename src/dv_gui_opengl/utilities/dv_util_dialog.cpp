@@ -12,6 +12,12 @@ std::vector<std::string> dv_util_dialog::open_file(const std::string& title, con
     return pfd::open_file(title, path, filters).result();
 }
 
+std::string dvsku::dv_util_dialog::save_file(const std::string& title, const std::string& path, 
+    bool confirm_override, std::vector<std::string> filters) 
+{
+    return pfd::save_file(title, path, filters, confirm_override).result();
+}
+
 std::string dv_util_dialog::select_dir(const std::string& title, const std::string& path) {
     return pfd::select_folder(title, path).result();
 }
