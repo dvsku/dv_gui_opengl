@@ -975,6 +975,9 @@ inline internal::file_dialog::file_dialog(type in_type,
 
         if (in_type == type::save)
         {
+            auto wextension = std::wstring(64, L'\0');
+            ofn.lpstrDefExt = (LPWSTR)wextension.data();
+
             if (!(options & opt::force_overwrite))
                 ofn.Flags |= OFN_OVERWRITEPROMPT;
 
