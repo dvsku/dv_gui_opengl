@@ -227,9 +227,13 @@ void dv_window::release() {}
 
 void dv_window::on_before_update() {}
 
+void dv_window::on_update() {}
+
 void dv_window::on_after_update() {}
 
 void dv_window::on_gui_before_update() {}
+
+void dv_window::on_gui_update() {}
 
 void dv_window::on_gui_after_update() {}
 

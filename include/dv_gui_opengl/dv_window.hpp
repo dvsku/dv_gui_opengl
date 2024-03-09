@@ -36,11 +36,11 @@ namespace dvsku {
         virtual void release();
 
     	virtual void on_before_update();
-    	virtual void on_update() = 0;
+    	virtual void on_update();
     	virtual void on_after_update();
 
     	virtual void on_gui_before_update();
-    	virtual void on_gui_update() = 0;
+    	virtual void on_gui_update();
     	virtual void on_gui_after_update();
 
     	virtual void on_resize(int width, int height);
