@@ -29,6 +29,11 @@ namespace dvsku {
     	GLFWwindow* m_native    = nullptr;
     	bool        m_minimized = false;
 
+        bool m_is_title_bar = false;
+        bool m_is_iconify   = false;
+        bool m_is_maximize  = false;
+        bool m_is_close     = false;
+
         mouse_pos m_mouse_pos{};
 
     protected:
@@ -49,20 +54,23 @@ namespace dvsku {
     	virtual void on_mouse_move(double dx, double dy);
         virtual void on_drop(int count, const char* paths[]);
 
-        /// <summary>
-        /// Title bar hit testing when borderless.
-        /// Enables window drag and snapping.
-        /// </summary>
-        virtual bool is_title_bar(int32_t x, int32_t y);
-
-        /// <summary>
-        /// Maximize/restore button hit testing when borderless
-        /// Enables snap.
-        /// </summary>
-        virtual bool is_maximize_button(int32_t x, int32_t y);
-
     protected:
         void set_borderless();
+
+        /// <summary>
+        /// Close the window
+        /// </summary>
+        void close();
+
+        /// <summary>
+        /// Minimize the window
+        /// </summary>
+        void minimize();
+
+        /// <summary>
+        /// Get window minimized
+        /// </summary>
+        bool is_minimized();
 
     private:
         intptr_t m_default_wndproc = 0;

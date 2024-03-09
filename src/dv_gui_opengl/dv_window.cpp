@@ -154,10 +154,10 @@ intptr_t dv_window::wndproc_callback(dv_window* wnd, handle_t handle, uint32_t m
             
             ScreenToClient(hwnd, &client_mouse_pos);
 
-            if (wnd->is_maximize_button(client_mouse_pos.x, client_mouse_pos.y))
+            if (wnd->m_is_maximize)
                 return HTMAXBUTTON;
 
-            if (!modal && wnd->is_title_bar(client_mouse_pos.x, client_mouse_pos.y))
+            if (!modal && !ImGui::IsAnyItemHovered() && wnd->m_is_title_bar)
                 return HTCAPTION;
 
             break;
@@ -247,14 +247,6 @@ void dv_window::on_mouse_move(double dx, double dy) {}
 
 void dv_window::on_drop(int count, const char* paths[]) {}
 
-bool dv_window::is_title_bar(int32_t x, int32_t y) {
-    return false;
-}
-
-bool dv_window::is_maximize_button(int32_t x, int32_t y) {
-    return false;
-}
-
 void dv_window::set_borderless() {
     auto win32_wnd = glfwGetWin32Window(m_native);
     if (!win32_wnd)
@@ -288,6 +280,18 @@ void dv_window::set_borderless() {
 
     // Force window redraw
     SetWindowPos(win32_wnd, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED);
+}
+
+void dv_window::close() {
+    glfwSetWindowShouldClose(m_native, 1);
+}
+
+void dv_window::minimize() {
+    glfwIconifyWindow(m_native);
+}
+
+bool dv_window::is_minimized() {
+    return m_minimized;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
