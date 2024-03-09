@@ -73,7 +73,8 @@ namespace dvsku {
         bool is_minimized();
 
     private:
-        intptr_t m_default_wndproc = 0;
+        intptr_t m_default_wndproc         = 0;
+        bool     m_skip_title_bar_hit_test = false;
 
     private:
     	void loop();

@@ -157,7 +157,7 @@ intptr_t dv_window::wndproc_callback(dv_window* wnd, handle_t handle, uint32_t m
             if (wnd->m_is_maximize)
                 return HTMAXBUTTON;
 
-            if (!modal && !ImGui::IsAnyItemHovered() && wnd->m_is_title_bar)
+            if (!modal && !wnd->m_skip_title_bar_hit_test && wnd->m_is_title_bar)
                 return HTCAPTION;
 
             break;
@@ -303,6 +303,8 @@ void dv_window::loop() {
     		glfwWaitEvents();
     		continue;
     	}
+
+        m_skip_title_bar_hit_test = ImGui::IsAnyItemHovered();
 
     	// OpenGL render pass
     	on_before_update();
