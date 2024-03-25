@@ -36,7 +36,7 @@ namespace dvsku {
 
         // Execute all commands that are set to execute
         void execute_all() {
-            for (auto& [type, command] : commands)
+            for (auto& [type, command] : m_commands)
                 command.execute();
         }
 
